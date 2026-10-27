@@ -58,6 +58,18 @@ cd pilates-agent
 - 最新打法来自 2026-09/10 的预售项目归档
 - 教练专业基线是通用基线，**需持证教练复核**，尤其孕产与腹直肌分离部分
 
+## 与本机教练助手系统的集成
+
+`knowledge/09_教练助手系统.md` 说明如何通过**只读桥脚本**读取本机课序引擎（Node + SQLite，`data/studio.db`）的真实数据：
+
+```powershell
+node app/agent-bridge.js client 李姐
+node app/agent-bridge.js today
+node app/agent-bridge.js week
+```
+
+Agent 在涉及具体客户、课表、复测时**先取数再回答**；桥是只读的，排课、扣次、改档案仍由教练在 App 里完成。
+
 ## 边界
 
 不做医疗诊断；孕期、术后、急性疼痛、腹直肌分离 ≥2 指、盆底功能障碍必须转介；不承诺疗效与减重数字；正文不留联系方式。
