@@ -71,6 +71,10 @@ for pkg in packages:
 for patch in root.rglob("cordis.patch.yml"):
     check_patch(patch)
 
+patches = list(root.rglob("cordis.patch.yml"))
+if patches and not (root / "install.ps1").exists():
+    errors.append("install.ps1 is required: presets reference absolute paths")
+
 readme = root / "README.md"
 if not readme.exists():
     errors.append("README.md is missing")

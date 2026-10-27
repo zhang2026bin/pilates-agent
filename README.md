@@ -32,16 +32,14 @@ plugin/                DSH agent preset（挂在 DSH 里用）
 ## 安装（DSH）
 
 ```powershell
-dsh plugin --profile desktop add "file:<本仓库路径>/plugin"
+git clone https://github.com/zhang2026bin/pilates-agent.git
+cd pilates-agent
+.\install.ps1
 ```
 
-然后在 `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles` 里加：
+脚本会自动做三件事：把 preset 里的绝对路径改写成本仓库的 `agent/`、安装插件包、把 `dsh-agent-pilates` 加进 profile 的 bundles。完成后重启应用。
 
-```json
-"dsh-agent-pilates"
-```
-
-并把 `plugin/cordis.patch.yml` 里 `agent/` 的绝对路径改成你本机的实际路径，重启应用。
+> 需要 `dsh` 命令在 PATH 中。手动安装等价于：`dsh plugin --profile desktop add "file:.\plugin"` + 把 `dsh-agent-pilates` 写进 `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles`。
 
 ## 怎么用
 
