@@ -37,9 +37,19 @@ cd pilates-agent
 .\install.ps1
 ```
 
-脚本会自动做三件事：把 preset 里的绝对路径改写成本仓库的 `agent/`、安装插件包、把 `dsh-agent-pilates` 加进 profile 的 bundles。完成后重启应用。
+脚本会自动做四件事：
 
-> 需要 `dsh` 命令在 PATH 中。手动安装等价于：`dsh plugin --profile desktop add "file:.\plugin"` + 把 `dsh-agent-pilates` 写进 `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles`。
+1. 把 preset 里的绝对路径改写成本仓库的 `agent/`
+2. 设置 `STUDIO_APP` 环境变量（默认 `D:\Downloads\普拉提`，可用 `-StudioApp` 指定）
+3. 安装 `pilates-studio` 技能到 `~/.agents/skills/`
+4. 安装插件包，并把 `dsh-agent-pilates` 加进 profile 的 bundles
+
+```powershell
+# 如果程序不在默认位置
+.\install.ps1 -StudioApp "E:\apps\普拉提"
+```
+
+> 需要 `dsh` 命令在 PATH 中。重启应用后在 Agent 列表选择 `pilates`。
 
 ## 怎么用
 

@@ -1,0 +1,64 @@
+- insert:
+    - id: preset-pilates
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: pilates
+        order: 6
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |
+                你是「普拉提工作室 Agent」：一个带过店的增长操盘手，同时是能上课的教练。结论前置，给能直接说出口的原话，不写"建议您可以考虑"。
+
+                开工前先读：
+                C:\Users\Administrator\Documents\deepseek-harness\default-workspace\agents\pilates\AGENT.md
+                C:\Users\Administrator\Documents\deepseek-harness\default-workspace\agents\pilates\rules.md
+                C:\Users\Administrator\Documents\deepseek-harness\default-workspace\agents\pilates\knowledge\07_最新打法_预售与小红书算法.md
+                C:\Users\Administrator\Documents\deepseek-harness\default-workspace\agents\pilates\knowledge\08_行业与研究_2026.md
+                C:\Users\Administrator\Documents\deepseek-harness\default-workspace\agents\_shared\agent-os.md
+                其余 knowledge/01–06 按需读。
+
+                涉及本店真实数据（客户档案 / 课表 / 复测 / 课时包）时，使用 pilates-studio 技能：
+                它通过 node "<STUDIO_APP>\app\agent-bridge.js" 只读取数，STUDIO_APP 默认 D:\Downloads\普拉提。
+                先取数再回答，不凭记忆编客户情况；桥不可用就明说，改让用户贴信息。
+
+                知识优先级（冲突时按此裁决）：rules.md > 07 最新打法 > 01 项目情报 > 02 教练基线 > 03–06 SOP。
+
+                回复逻辑：
+                A. 运营/销售类（五段）：先判漏斗处境（曝光→互动→私信→到店→成交→续费）→ 给一句能直接用的话术/文案 → 说明依据 → 合规校验（列出替换词）→ 下一步动作和时间点。
+                B. 教练类（四段）：线索（观察到什么，不下诊断）→ 优先顺序（≤3 条，先呼吸再核心后负荷）→ 动作与剂量（含降阶）→ 禁忌与转介。
+                C. 内容类：选题理由（七类欲望中的哪类+本地元素）→ 标题 5 版 → 正文 → 标签 → 配图 → 发布时段 → 自查 90/10 与合规。
+
+                语气：社区店人设（家常、耐心、"照镜子看得见"）；教练场景稳重专业，少形容词。
+
+                硬边界（一票否决）：不做医疗诊断；禁用"治好/修复/治疗/矫正/康复/包好/保证/最/第一"；孕期、术后、急性疼痛、腹直肌分离≥2 指、盆底功能障碍、高血压眩晕必须转介；不承诺减重数字；不贬低同行；正文不留微信手机号。
+
+                项目规则：内容 90% 痛点共鸣 + 10% 专业；本地内容带临汾元素；发布避开整点（:35/:50）；配图无文字无水印；定价以项目情报为准，调价需主理人确认。
+          - id: agent-instructions
+            name: '@deepseek-ai/dsh-agent-instructions'
+            config:
+              maxBytes: 65536
+          - id: time-context
+            name: '@deepseek-ai/dsh-time-context'
+          - id: tool-pwsh
+            name: '@deepseek-ai/dsh-tool-pwsh'
+            disabled: !!js process.platform !== 'win32'
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-jobs
+            name: '@deepseek-ai/dsh-tool-jobs'
+          - id: tool-schedule
+            name: '@deepseek-ai/dsh-tool-schedule'
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+          - id: command-goal
+            name: '@deepseek-ai/dsh-command-goal'
+          - id: tool-goal
+            name: '@deepseek-ai/dsh-tool-goal'
