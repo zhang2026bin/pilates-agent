@@ -9,39 +9,45 @@ $repo = $PSScriptRoot
 $package = "dsh-agent-pilates"
 $patch = Join-Path $repo "plugin\cordis.patch.yml"
 $agentDir = Join-Path $repo "agent"
+$sharedDir = Join-Path $repo "agent\_shared"
 $enc = New-Object System.Text.UTF8Encoding($false)
 
 if (-not (Test-Path $patch)) { throw "找不到 $patch" }
 
-# 1. 改写 preset 里的绝对路径
+# 1. 改写 preset 里的绝对路径（含 _shared）
 Copy-Item $patch "$patch.bak" -Force
 $text = Get-Content $patch -Raw -Encoding UTF8
 $text = [regex]::Replace($text, '[A-Za-z]:\\[^\r\n]*?\\agents\\pilates\\', ($agentDir.TrimEnd('\') + '\'))
+$text = [regex]::Replace($text, '[A-Za-z]:\\[^\r\n]*?\\agents\\_shared\\', ($sharedDir.TrimEnd('\') + '\'))
 [IO.File]::WriteAllText($patch, $text, $enc)
 Write-Host "[1/4] 已改写 preset 路径 -> $agentDir"
 
-# 2. 接入本地课序引擎：写环境变量 + 安装数据技能
+# 2. 安装数据桥技能（独立于本机是否装了课序引擎）
+$skillSrc = Join-Path $repo "plugin\skill\pilates-studio"
+if (Test-Path $skillSrc) {
+    $skillDst = Join-Path $env:USERPROFILE ".agents\skills\pilates-studio"
+    New-Item -ItemType Directory -Force -Path (Split-Path $skillDst) | Out-Null
+    Copy-Item $skillSrc $skillDst -Recurse -Force
+    Write-Host "[2/4] 技能已安装 -> $skillDst"
+} else {
+    Write-Host "[2/4] 未找到 $skillSrc，跳过技能安装" -ForegroundColor Yellow
+}
+
+# 2b. 若本机有课序引擎，写入 STUDIO_APP
 $bridge = Join-Path $StudioApp "app\agent-bridge.js"
 if (Test-Path $bridge) {
     [Environment]::SetEnvironmentVariable("STUDIO_APP", $StudioApp, "User")
     $env:STUDIO_APP = $StudioApp
-    Write-Host "[2/4] 已设置 STUDIO_APP = $StudioApp"
-
-    $skillSrc = Join-Path $repo "plugin\skill\pilates-studio"
-    if (Test-Path $skillSrc) {
-        $skillDst = Join-Path $env:USERPROFILE ".agents\skills\pilates-studio"
-        Copy-Item $skillSrc $skillDst -Recurse -Force
-        Write-Host "[2/4] 已安装技能 pilates-studio"
-    }
+    Write-Host "[2b] STUDIO_APP = $StudioApp"
 } else {
-    Write-Host "[2/4] 未找到 $bridge，跳过数据接入；之后可手动设置 STUDIO_APP" -ForegroundColor Yellow
+    Write-Host "[2b] 未找到 $bridge，跳过数据桥配置（之后可手动设置 STUDIO_APP）" -ForegroundColor Yellow
 }
 
 # 3. 安装插件包
 if (-not (Get-Command dsh -ErrorAction SilentlyContinue)) {
     throw "找不到 dsh 命令，请确认 DeepSeek Harness 已安装并在 PATH 中"
 }
-& dsh plugin --profile $Profile add "file:$(Join-Path $repo 'plugin')"
+& dsh plugin --profile $Profile add "file:$repo\plugin"
 if ($LASTEXITCODE -ne 0) { throw "dsh plugin add 失败" }
 Write-Host "[3/4] 插件包已安装"
 
@@ -62,4 +68,3 @@ if (Test-Path $profileJson) {
 
 Write-Host ""
 Write-Host "完成。重启 DeepSeek Harness，然后在 Agent 列表选择 pilates。" -ForegroundColor Green
-Write-Host "验证数据桥：node `"$StudioApp\app\agent-bridge.js`" list"

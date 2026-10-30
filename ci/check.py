@@ -72,8 +72,15 @@ for patch in root.rglob("cordis.patch.yml"):
     check_patch(patch)
 
 patches = list(root.rglob("cordis.patch.yml"))
-if patches and not (root / "install.ps1").exists():
+install = root / "install.ps1"
+if patches and not install.exists():
     errors.append("install.ps1 is required: presets reference absolute paths")
+elif patches:
+    script = install.read_text(encoding="utf-8", errors="ignore")
+    patch_text = "\n".join(p.read_text(encoding="utf-8", errors="ignore") for p in patches)
+    for token in sorted(set(re.findall(r"\\agents\\([A-Za-z0-9_-]+)\\", patch_text))):
+        if f"\\agents\\{token}\\" not in script:
+            errors.append(f"install.ps1 does not rewrite '\\agents\\{token}\\'")
 
 readme = root / "README.md"
 if not readme.exists():
